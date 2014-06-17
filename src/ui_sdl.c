@@ -761,50 +761,49 @@ void interactivemode(char* codetoload) {
 		}
 		{
 			static int lastpage=0;
-			if(lastpage!=vm.visiblepage) {
-				lastpage=vm.visiblepage;
+			if (lastpage != vm.visiblepage) {
+				lastpage = vm.visiblepage;
 				ui.framecounter++;
-				if(ui.opt_nonrealtime) nrtframestep();
+				if (ui.opt_nonrealtime) nrtframestep();
 			}
 		}
-		if(t>=120+ui.bmtime) {
-			float secs=(t-ui.bmtime)/60.0;
-			ui.mops=ui.cyclecounter/(secs*1000000);
-			ui.fps=ui.framecounter/secs;      
-			ui.cyclecounter=ui.framecounter=0;
-			ui.bmtime=t;
+		if (t >= 120 + ui.bmtime) {
+			float secs = (t - ui.bmtime) / 60.0;
+			ui.mops = ui.cyclecounter / (secs * 1000000);
+			ui.fps = ui.framecounter / secs;      
+			ui.cyclecounter = ui.framecounter=0;
+			ui.bmtime = t;
 		}
-		if(ui.runstat==0) {
+		if (ui.runstat == 0) {
 			if(!ui.opt_playback)
 				SDL_WaitEvent(&e);
 			else {
-				e.type=SDL_NOEVENT;
+				e.type = SDL_NOEVENT;
 				SDL_PollEvent(&e);
-				if(e.type==SDL_NOEVENT)
+				if(e.type == SDL_NOEVENT)
 					pollplaybackevent(&e);
-				if(e.type==SDL_NOEVENT && ui.opt_nonrealtime)
+				if(e.type == SDL_NOEVENT && ui.opt_nonrealtime)
 					nrtframestep();
 			}
 		} else {
 			e.type=SDL_NOEVENT;
 			SDL_PollEvent(&e);
-			if(ui.opt_playback && e.type==SDL_NOEVENT)
+			if (ui.opt_playback && e.type == SDL_NOEVENT)
 				pollplaybackevent(&e);
-			if(e.type==SDL_NOEVENT) {
-				if(codechanged) {
+			if (e.type == SDL_NOEVENT) {
+				if (codechanged) {
 					vm_compile(ed_getprogbuf());
-					if(ui.audio_off)
-					{
-						ui.audio_off=0;
+					if (ui.audio_off) {
+						ui.audio_off = 0;
 						pauseaudio(0);
 					}
-					codechanged=0;
+					codechanged = 0;
 				}
 				{
 					int c = vm_run();
 					ui.cyclecounter+=c;
 				}
-				if(ui.opt_nonrealtime) {
+				if (ui.opt_nonrealtime) {
 					dumper.subframe++;
 					if(!(dumper.subframe&4095)) nrtframestep();
 				}
@@ -813,92 +812,92 @@ void interactivemode(char* codetoload) {
 				continue;
 			}
 		}
-		if(e.type==SDL_QUIT) break;
-		if(e.type==SDL_KEYDOWN) {
+		if (e.type == SDL_QUIT) break;
+		if (e.type == SDL_KEYDOWN) {
 			int sym=e.key.keysym.sym;
 			int mod=e.key.keysym.mod;
 
-			if(ui.opt_dumpkeys) {
-				static int last=0;
+			if (ui.opt_dumpkeys) {
+				static int last = 0;
 				int now=getticks();
-				if(!sym && e.key.keysym.unicode)
+				if (!sym && e.key.keysym.unicode)
 						 sym=e.key.keysym.unicode;
-				printf("%d %d %d %d\n",now-last,sym,
-					e.key.keysym.unicode,mod);
-				last=now;
+				printf("%d %d %d %d\n", now-last, sym,
+					e.key.keysym.unicode, mod);
+				last = now;
 			}
 
 			getkeystates();
 
 			
-			if (sym==SDLK_ESCAPE) break;
-			else if(sym==SDLK_TAB) {
-				ui.osd_visible^=1;
-			} else if(sym==SDLK_F1) {
+			if (sym == SDLK_ESCAPE) break;
+			else if (sym == SDLK_TAB) {
+				ui.osd_visible ^= 1;
+			} else if (sym == SDLK_F1) {
 				pauseaudio(ui.runstat);
-				ui.runstat^=1;
-				if(ui.runstat==0) {
+				ui.runstat ^= 1;
+				if (ui.runstat == 0) {
 					ui.paused_since=getticks();
 				} else {
 					ui.timercorr+=getticks()-ui.paused_since;
 					ui.mops=ui.fps=ui.bmtime=0;
 				}
-			} else if (sym==SDLK_F2) {
-				ui.timercorr=ui.paused_since=getticks();
-				if(codechanged) {
+			} else if (sym == SDLK_F2) {
+				ui.timercorr=ui.paused_since = getticks();
+				if (codechanged) {
 					vm_compile(ed_getprogbuf());
 					codechanged=0;
 				}
 				vm_init();
-				ui.auplayptr=ui.auplaytime=0;
-				pauseaudio(ui.runstat^1);
+				ui.auplayptr = ui.auplaytime=0;
+				pauseaudio(ui.runstat ^ 1);
 			} else if (ui.osd_visible) {
 				/* editor keys */
 			
-				if(sym==SDLK_UP && (mod&KMOD_CTRL)) {
+				if(sym==SDLK_UP && (mod & KMOD_CTRL)) {
 					ed_increment(ed.cursor);
 					codechanged=1;
-				} else if(sym==SDLK_DOWN && (mod&KMOD_CTRL)) {
+				} else if (sym==SDLK_DOWN && (mod & KMOD_CTRL)) {
 					ed_decrement(ed.cursor);
 					codechanged=1;
-				} else if(sym==SDLK_LEFT && (mod&KMOD_CTRL)) {
+				} else if (sym == SDLK_LEFT && (mod & KMOD_CTRL)) {
 					ed_prev();
-				} else if(sym==SDLK_RIGHT && (mod&KMOD_CTRL)) {
+				} else if (sym == SDLK_RIGHT && (mod & KMOD_CTRL)) {
 					ed_next();
-				} else if(sym==SDLK_LEFT) {
+				} else if (sym == SDLK_LEFT) {
 					ed_left(mod&KMOD_SHIFT);
-				} else if(sym==SDLK_RIGHT) {
+				} else if (sym == SDLK_RIGHT) {
 					ed_right(mod&KMOD_SHIFT);
-				} else if(sym==SDLK_UP) {
-					ed_up(mod&KMOD_SHIFT);
-				} else if(sym==SDLK_DOWN) {
+				} else if (sym == SDLK_UP) {
+					ed_up (mod&KMOD_SHIFT);
+				} else if (sym == SDLK_DOWN) {
 					ed_down(mod&KMOD_SHIFT);
-				} else if(sym==SDLK_BACKSPACE) {
+				} else if (sym == SDLK_BACKSPACE) {
 					ed_backspace(-1);
-					codechanged=1;
-				} else if(sym==SDLK_DELETE) {
+					codechanged = 1;
+				} else if (sym == SDLK_DELETE) {
 					ed_backspace(0);
 					codechanged=1;
-				} else if(sym==SDLK_F12) {
+				} else if (sym == SDLK_F12) {
 					ed_switchbuffers();
-				} else if(sym=='s' && (mod&KMOD_CTRL)) {
+				} else if (sym == 's' && (mod & KMOD_CTRL)) {
 					ed_save();
-				} else if(sym=='c' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'c' && (mod & KMOD_CTRL)) {
 					ed_copy();
-				} else if(sym=='k' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'k' && (mod & KMOD_CTRL)) {
 					ed_copy();
-				} else if(sym=='v' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'v' && (mod & KMOD_CTRL)) {
 					ed_paste();
-				} else if(sym=='x' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'x' && (mod & KMOD_CTRL)) {
 					ed_cut();
-				} else if(sym=='a' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'a' && (mod & KMOD_CTRL)) {
 					if (ed.selectbase) ed_unselect();
 					else {
 						ed.selectstart=ed.textbuffer;
 						ed.selectend=ed.textbuffer+strlen(ed.textbuffer);
 						ed.selectbase=ed.cursor;
 					}
-				} else if(sym=='b' && (mod&KMOD_CTRL)) {
+				} else if (sym == 'b' && (mod&KMOD_CTRL)) {
 					ui.benchmark_mode^=1;
 				} else {
 					if(e.key.keysym.unicode) {
@@ -907,13 +906,13 @@ void interactivemode(char* codetoload) {
 					}
 				}
 			}
-		} else if(e.type==SDL_KEYUP) {
+		} else if (e.type == SDL_KEYUP) {
 			getkeystates();
-		} else if(e.type==SDL_MOUSEMOTION) {
-			int y=(e.motion.y*256)/sdl.winsz;
-			int x=(e.motion.x*256)/sdl.winsz;
-			if(y>=0 && x>=0 && y<=255 && x<=255)
-				vm.userinput=(vm.userinput&0xFFFF0000)|(y<<8)|x;
+		} else if (e.type == SDL_MOUSEMOTION) {
+			int y = (e.motion.y * 256) / sdl.winsz;
+			int x = (e.motion.x * 256) / sdl.winsz;
+			if (y >= 0 && x>=0 && y<=255 && x <= 255)
+				vm.userinput = (vm.userinput & 0xFFFF0000) | (y << 8) | x;
 		} else if(e.type==SDL_MOUSEBUTTONDOWN) {
 			vm.userinput|=0x80000000;
 		} else if(e.type==SDL_MOUSEBUTTONUP) {
@@ -924,105 +923,117 @@ void interactivemode(char* codetoload) {
 			sdl.ymargin=(e.resize.h-sdl.winsz)/2;
 
 			SDL_FreeSurface(sdl.s);
-			sdl.s=SDL_SetVideoMode(e.resize.w,e.resize.h,0,SDL_RESIZABLE);
+			sdl.s = SDL_SetVideoMode(e.resize.w, e.resize.h, 0, SDL_RESIZABLE);
 			SDL_FreeYUVOverlay(sdl.o);
-			sdl.o=SDL_CreateYUVOverlay(256,256,SDL_YUY2_OVERLAY,sdl.s);
-			SDL_WM_SetCaption("IBNIZ","IBNIZ");
+			sdl.o = SDL_CreateYUVOverlay(256, 256, SDL_YUY2_OVERLAY, sdl.s);
+			SDL_WM_SetCaption("IBNIZ", "IBNIZ");
 
 			showyuv();
 		}
 #ifdef X11
-		else if(e.type==SDL_SYSWMEVENT) {
+		else if(e.type == SDL_SYSWMEVENT) {
 			clipboard_handlesysreq(&e);
 		}
 #endif
 	}
 }
 
-int main(int argc, char**argv) {
-	signed char autorun=-1;
-	char*codetoload = welcometext;
-	ui.opt_dumpkeys=0;
-	ui.opt_nonrealtime=0;
-	ui.opt_playback=0;
-	ui.opt_dumpmedia=0;
-	ui.opt_nonrealtime=0;
-	ui.osd_visible=1;
+
+//█████████████████████████████████████████
+//██▄░░█░░▄████████████▄███████████████████
+//███░▄▀▄░██▀▄▄▄▄▀███▄▄░████▄░▀▄▄▀█████████
+//███░█▄█░██▀▄▄▄▄░█████░█████░███░█████████
+//██▀░▀█▀░▀█▄▀▀▀▄░▀██▀▀░▀▀██▀░▀█▀░▀████████
+//█████████████████████████████████████████
+
+int main(int argc, char** argv) {
+	signed char autorun = -1;
+	char* codetoload = welcometext;
+
+	ui.opt_dumpkeys    = 0;
+	ui.opt_nonrealtime = 0;
+	ui.opt_playback    = 0;
+	ui.opt_dumpmedia   = 0;
+	ui.opt_nonrealtime = 0;
+	ui.osd_visible     = 1;
+
 	argv++;
+
 	while(*argv) {
 		char*s=*argv;
 		if(*s=='-') {
 			while(s[0]=='-') s++;
 			switch((int)*s) {
 				case('h'):
-					printf(usagetext,argv[0]);
+					printf(usagetext, argv[0]);
 					exit(0);
 				case('v'):
 					puts(versiontext);
 					exit(0);
 				case('c'):
 					argv++;
-					codetoload=*argv;
-					if(autorun<0) autorun=1;
+					codetoload = *argv;
+					if(autorun<0) autorun = 1;
 					break;
 				case('n'):
-					autorun=0;
+					autorun = 0;
 					break;
 				case('e'):
-					ui.opt_dumpkeys=1;
+					ui.opt_dumpkeys = 1;
 					break;
 				case('p'):
-					ui.opt_playback=1;
+					ui.opt_playback = 1;
 					break;
 				case('M'):
-					ui.opt_dumpmedia=1;
-					ui.opt_nonrealtime=1;
+					ui.opt_dumpmedia = 1;
+					ui.opt_nonrealtime = 1;
 					break;
 			}
 		} else {
-			FILE*f=fopen(s,"r");
-			char buf[EDITBUFSZ+1];
-			int hdrlgt,buflgt;
+			FILE*f=fopen(s, "r");
+			char buf[EDITBUFSZ + 1];
+			int hdrlgt, buflgt;
 			//if(codetoload) free(codetoload);
-			if(!f) {
-				fprintf(stderr,"Can't load file '%s'\n",s);
+			if (!f) {
+				fprintf(stderr, "Can't load file '%s'\n", s);
 				exit(1);
 			}
-			hdrlgt=sprintf(buf,"\\#file %s\n",s);
+			hdrlgt=sprintf(buf, "\\#file %s\n", s);
 			buflgt=0;
-			while(!feof(f)) {
-				buflgt+=fread(buf+hdrlgt+buflgt,1,EDITBUFSZ-hdrlgt,f);
+			while (!feof(f)) {
+				buflgt += fread(buf + hdrlgt + buflgt, 1, EDITBUFSZ-hdrlgt, f);
 			}
-			buf[hdrlgt+buflgt]='\0';
+			buf[hdrlgt + buflgt] = '\0';
 			codetoload=strdup(buf);
-			if(autorun<0) autorun=1;
+			if (autorun < 0) autorun = 1;
 		}
 		argv++;
 	}
 
-	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 	sdl.winsz=512;
-	sdl.s=SDL_SetVideoMode(sdl.winsz,sdl.winsz,0,SDL_RESIZABLE);
-	sdl.o=SDL_CreateYUVOverlay(256,256,SDL_YUY2_OVERLAY,sdl.s);
+	sdl.s=SDL_SetVideoMode(sdl.winsz, sdl.winsz, 0, SDL_RESIZABLE);
+	sdl.o=SDL_CreateYUVOverlay(256, 256, SDL_YUY2_OVERLAY, sdl.s);
 	SDL_WM_SetCaption("IBNIZ", "IBNIZ");
  
 	{SDL_AudioSpec as;
-		as.freq=44100;
-		as.format=AUDIO_S16;
-		as.channels=1;
-		as.samples=512;
-		as.callback=updateaudio;
-		SDL_OpenAudio(&as,NULL);
-		DEBUG(stderr,"buffer size: %d\n",as.samples);
+		as.freq     = 44100;
+		as.format   = AUDIO_S16;
+		as.channels = 1;
+		as.samples  = 512;
+		as.callback = updateaudio;
+
+		SDL_OpenAudio(&as, NULL);
+		DEBUG(stderr, "buffer size: %d\n", as.samples);
 	}
 	
 	vm_compile(codetoload);
-	ui.runstat=(autorun==1)?1:0;
-	if(autorun==1) ui.osd_visible=0;
-	ui.timercorr=ui.paused_since=getticks();
+	ui.runstat = (autorun == 1) ? 1 : 0;
+	if (autorun == 1) ui.osd_visible = 0;
+	ui.timercorr = ui.paused_since=getticks();
 	vm_init();
-	pauseaudio(ui.runstat^1);
+	pauseaudio(ui.runstat ^ 1);
 	interactivemode(codetoload);
 	
 	SDL_Quit();
