@@ -10,10 +10,15 @@
 ### [compiler.i](./src/compiler.i)
 
 ### [font.i](./src/font.i)
-font symbol definition. Included in [ui_sdl.c](./src/ui_sdl.c) as `uint8_t font[] = {#include "font.i"};`
+font symbol definition. Included in [ui_sdl.c](./src/ui_sdl.c) as 
+```c
+uint8_t font[] = {
+#include "font.i"
+};
+```
 
 ### [font.pl](./src/font.pl)
-perl script to generate `font.i` from ASCII art
+Perl script to generate `font.i` from ASCII art
 
 ### [gen.h](./src/gen.h)
 
