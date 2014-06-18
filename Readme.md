@@ -13,7 +13,7 @@
 font symbol definition. Included in [ui_sdl.c](./src/ui_sdl.c) as 
 ```c
 uint8_t font[] = {
-#include "font.i"
+	#include "font.i"
 };
 ```
 
@@ -34,6 +34,20 @@ Perl script to generate `font.i` from ASCII art
 
 ### [ibniz2c.c](./src/ibniz2c.c)
 **main entry point**
+```c
+int main(int argc, char** argv) {
+	int rc;
+
+	if (argc <= 1) {
+		fprintf(stderr, "usage: %s 'ibnizcode'\n", argv[0]);
+		return 1;
+	}
+	compiler_parse(argv[1]);
+	rc = compiler_compile();
+	printf("// compiler returned with %d\n", rc);
+	return 0;
+}
+```
 
 ### [texts.i](./src/texts.i)
 
@@ -92,7 +106,7 @@ variables directly as pixel values and audio data.
 A slightly longer example program would be:
 
 ```
-        ^xp
+				^xp
 ```
 
 Which consists of three operations: ^ (xor), x (exchange) and p (pop).
@@ -111,7 +125,7 @@ The last opcode, 'pop' ('p') corresponds to Forth's DROP and moves the stack
 pointer so that the value on top of the stack gets 'popped off'. So, after
 the execution of the three instructions '^xp', the values T Y X have been
 transformed into Y XOR X.
-                        
+												
 Whatever data remains in the stack is interpreted as pixel colors in the YUV
 colorspace (bit format VVUU.YYYY; thus, the integer part roughly corresponds
 to hue and the fraction part to intensity). As the range of X and Y is
@@ -126,7 +140,7 @@ time the stack pointer passes a page boundary.
 An audio example:
 
 ```
-        d3r15&*
+				d3r15&*
 ```
 
 In the audio context, only one value (T) is pushed on top of stack on each
@@ -153,7 +167,7 @@ is scheduled by VM-level logic: in normal cases, the video context loop is
 run 64 times per audio context loop cycle.
 
 ```
-        *x~FF&* M d3r15&*
+				*x~FF&* M d3r15&*
 ```
 
 **IBNIZ** is a universal programming language, not just an expression evaluator.
@@ -267,20 +281,20 @@ depending on context and mode, is as follows:
 context  mode  pushes on stack
 -------  ----  ---------------
 video    TYX   TTTT.0000, YYYY.YYYY, XXXX.XXXX
-               where
-               - YYYY.YYYY and XXXX.XXXX are between -1 and +1
-                 (FFFF.0000 and 0000.FFFF)
-               - TTTT is the frame counter (time in 60ths of second)
+							 where
+							 - YYYY.YYYY and XXXX.XXXX are between -1 and +1
+								 (FFFF.0000 and 0000.FFFF)
+							 - TTTT is the frame counter (time in 60ths of second)
 
 video    T     TTTT.YYXX
-               where
-               - TTTT is the frame counter
-               - YY and XX range from 00 to FF (directly from SP)
+							 where
+							 - TTTT is the frame counter
+							 - YY and XX range from 00 to FF (directly from SP)
 
 audio    T     TTTT.TTTT
-               where
-               - the integer is the frame counter (same as in video)
-               - the fraction is, well, the 65536th part thereof
+							 where
+							 - the integer is the frame counter (same as in video)
+							 - the fraction is, well, the 65536th part thereof
 ```
 
 The current implementation changes the video context mode
@@ -330,7 +344,7 @@ symbol  name    description
 ;       endif   nop; marks end of conditional block when skipping
 ```
 
-        End of code is also regarded as a skip terminator in all cases.
+				End of code is also regarded as a skip terminator in all cases.
 
 ### Loops
 
@@ -402,23 +416,23 @@ U       userin  (-- inword)     get data from input device
 The `userin` instruction polls data from the input device.
 It returns a word in the format MMKK.YYXX where:
 - YYXX indicates the last known position, in unsigned coordinates,
-  of the pointing device (mouse, touch, lightpen, etc.)
+	of the pointing device (mouse, touch, lightpen, etc.)
 - KK indicates the unicode number of the last character entered on
-  keyboard, or 0 if no character is entered. If the unicode number
-  is above FF, it is wrapped to between 00 and FF. The value is
-  cleared to zero (or the next character in the buffer) whenever `U`
-  is used.
+	keyboard, or 0 if no character is entered. If the unicode number
+	is above FF, it is wrapped to between 00 and FF. The value is
+	cleared to zero (or the next character in the buffer) whenever `U`
+	is used.
 - MM is a bit structure indicating the state of click/state and a
-  couple of keyboard keys. Bits from top to bottom:
+	couple of keyboard keys. Bits from top to bottom:
 ```
-  80: click state (1 when a screen position is being clicked/touched)
-  40: ctrl key (1 = down)
-  20: alt/meta key
-  10: shift key
-  08: cursor up key
-  04: cursor down key
-  02: cursor left key
-  01: cursor right key
+	80: click state (1 when a screen position is being clicked/touched)
+	40: ctrl key (1 = down)
+	20: alt/meta key
+	10: shift key
+	08: cursor up key
+	04: cursor down key
+	02: cursor left key
+	01: cursor right key
 ```
 
 ## Data segment
@@ -467,33 +481,33 @@ symbol  name    desc
 
 ## Editor commands
 
-    Tab toggles the editor display on/off. When the editor is hidden,
-    keyboard commands don't affect the editor state.
+		Tab toggles the editor display on/off. When the editor is hidden,
+		keyboard commands don't affect the editor state.
 
-    Cursor keys etc. work as expected. Shift+cursor selects an area.
+		Cursor keys etc. work as expected. Shift+cursor selects an area.
 
-    Ctrl+up/down increments/decrements the number under cursor, with
-    carry.
+		Ctrl+up/down increments/decrements the number under cursor, with
+		carry.
 
-    Ctrl+left/right jumps to the final character of the previous or next
-    "word" (i.e. blank-separated section).
+		Ctrl+left/right jumps to the final character of the previous or next
+		"word" (i.e. blank-separated section).
 
-    f1 runs and pauses the code.
+		f1 runs and pauses the code.
 
-    f2 resets the VM state (including timer and memory).
+		f2 resets the VM state (including timer and memory).
 
-    Changes to the source code automatically recompile it but do not
-    restart it. This makes it convenient to do runtime changes to
-    numeric parameters etc. This functionality may change in the future.
+		Changes to the source code automatically recompile it but do not
+		restart it. This makes it convenient to do runtime changes to
+		numeric parameters etc. This functionality may change in the future.
 
-    ESC exits the program.
+		ESC exits the program.
 
-    Ctrl+C/X/V/A work as copy/cut/paste/selectall.
+		Ctrl+C/X/V/A work as copy/cut/paste/selectall.
 
-    Ctrl+S saves the program to the file indicated by a line beginning
-    with '\#file' (or if there's no such line, inserts the line
-    '\#file untitled.ib' and uses untitled.ib as the filename.
-    The '\#file' lines are automatically skipped when saving.
+		Ctrl+S saves the program to the file indicated by a line beginning
+		with '\#file' (or if there's no such line, inserts the line
+		'\#file untitled.ib' and uses untitled.ib as the filename.
+		The '\#file' lines are automatically skipped when saving.
 
 
 # Command line options
@@ -512,7 +526,7 @@ video:
 -e       Dump user keystrokes to stdout
 -p       Playback dumped user keystrokes from stdin
 -M       Dump raw video to stdout and raw audio to stderr.
-        30 fps, non-realtime, yuv4mpeg2 and pcm_s16.
+				30 fps, non-realtime, yuv4mpeg2 and pcm_s16.
 ```
 
 Some commands used in this process, for reference:
