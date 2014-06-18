@@ -10,7 +10,6 @@
 * [gen_c.c](./src/gen_c.c)
 * [gen_x86.c](./src/gen_x86.c)
 * [ibniz.h](./src/ibniz.h)
-* [ibniz.txt](./src/ibniz.txt)
 * [ibniz2c.c](./src/ibniz2c.c) **main entry point**
 * [texts.i](./src/texts.i)
 * [vm.h](./src/vm.h)
