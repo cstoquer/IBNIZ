@@ -3,12 +3,13 @@
 
 ### [ui_sdl.c](./src/ui_sdl.c)
 
-
+------------------
 ### [clipboard.c](./src/clipboard.c)
 
-
+------------------
 ### [compiler.i](./src/compiler.i)
 
+------------------
 ### [font.i](./src/font.i)
 font symbol definition. Included in [ui_sdl.c](./src/ui_sdl.c) as 
 ```c
@@ -16,34 +17,34 @@ uint8_t font[] = {
 #include "font.i"
 };
 ```
-
+------------------
 ### [font.pl](./src/font.pl)
 Perl script to generate `font.i` from ASCII art
-
+------------------
 ### [gen.h](./src/gen.h)
 
-
+------------------
 ### [gen_c.c](./src/gen_c.c)
 
-
+------------------
 ### [gen_x86.c](./src/gen_x86.c)
 
-
+------------------
 ### [ibniz.h](./src/ibniz.h)
 
-
+------------------
 ### [ibniz2c.c](./src/ibniz2c.c)
 **main entry point**
-
+------------------
 ### [texts.i](./src/texts.i)
 
-
+------------------
 ### [vm.h](./src/vm.h)
 
-
+------------------
 ### [vm_slow.c](./src/vm_slow.c)
 
-
+------------------
 ### [vm_test.c](./src/vm_test.c)
 
 
